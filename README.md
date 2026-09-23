@@ -41,8 +41,9 @@ Requires SillyTavern **1.19.0** or newer (tested on 1.19.0).
 |---|---|
 | A complete document (`<!DOCTYPE html>` or `<html>` at the start of a line), fenced or not | ✅ |
 | ```` ```html ```` block containing `<style>` or `<script>` | ✅ |
+| Bare ```` ``` ```` block (no language) that starts with `<!DOCTYPE html>` or `<html>` | ✅ |
 | ```` ```html ```` block with plain markup only (e.g. an example) | ❌ stays a code block |
-| Other fences (```` ```css ````, ```` ```js ````, bare ```` ``` ````) | ❌ |
+| Other fences (```` ```css ````, ```` ```js ````, bare ```` ``` ```` blocks that aren't a whole page) | ❌ |
 | Small inline HTML like `<span style="color:red">` | ❌ SillyTavern already handles it |
 
 Text before and after a page is formatted by SillyTavern as usual. A message can contain several pages.

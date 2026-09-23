@@ -75,9 +75,31 @@ test('other fence languages are never rendered and shield their content', () => 
     assert.match(segments[0].text, /```css/);
 });
 
-test('bare fences are never rendered, even around a full document', () => {
-    const segments = detect('```\n<!DOCTYPE html>\n<html><body>x</body></html>\n```');
-    assert.equal(htmlSegments(segments).length, 0);
+test('bare fence around a full document renders', () => {
+    const segments = detect('Here it is:\n```\n<!DOCTYPE html>\n<html><body>x</body></html>\n```');
+    assert.deepEqual(segments.map((s) => s.type), ['prose', 'html']);
+    assert.equal(segments[1].fenced, true);
+    assert.ok(segments[1].html.startsWith('<!DOCTYPE html>'));
+});
+
+test('bare fence starting with <html> renders', () => {
+    assert.equal(htmlSegments(detect('```\n  <html lang="en"><body>x</body></html>\n```')).length, 1);
+});
+
+test('bare fence renders only when the document is the whole block', () => {
+    assert.equal(htmlSegments(detect('```\n<style>p{}</style><p>x</p>\n```')).length, 0);
+    assert.equal(htmlSegments(detect('```\nconst page = "<!DOCTYPE html><html></html>";\n```')).length, 0);
+});
+
+test('bare fence documents follow the renderDocuments setting', () => {
+    const text = '```\n<!DOCTYPE html>\n<html><body>x</body></html>\n```';
+    assert.equal(htmlSegments(detect(text, { renderDocuments: false })).length, 0);
+});
+
+test('streaming bare fence shows as a page once it starts like a document', () => {
+    assert.equal(htmlSegments(detect('Intro\n```\n<!DOC', { streaming: true })).length, 1);
+    assert.equal(htmlSegments(detect('Intro\n```\n', { streaming: true })).length, 0);
+    assert.equal(htmlSegments(detect('Intro\n```\nconst x', { streaming: true })).length, 0);
 });
 
 test('tilde fences work', () => {

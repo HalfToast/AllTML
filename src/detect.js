@@ -17,7 +17,7 @@ const HAS_STYLE_OR_SCRIPT = /<(?:style|script)[\s>]/i;
  * Splits raw message text into prose and renderable HTML segments.
  * @param {string} text Raw message text
  * @param {object} [options]
- * @param {boolean} [options.renderDocuments=true] Render complete HTML documents
+ * @param {boolean} [options.renderDocuments=true] Render complete HTML documents, unfenced or in ```html / bare ``` blocks
  * @param {boolean} [options.renderFencedBlocks=true] Render ```html blocks containing <style> or <script>
  * @param {boolean} [options.streaming=false] Message is still streaming; any ```html block counts
  * @returns {Segment[]}
@@ -58,10 +58,13 @@ export function detect(text, { renderDocuments = true, renderFencedBlocks = true
         }
         const unterminated = end >= lines.length;
         const body = lines.slice(i + 1, end).join('\n');
-        const isHtml = open[2].toLowerCase() === 'html';
+        const lang = open[2].toLowerCase();
+        const render = lang === 'html'
+            ? shouldRenderFenced(body, { renderDocuments, renderFencedBlocks, streaming })
+            : lang === '' && renderDocuments && startsAsDocument(body, streaming);
 
         flushProse();
-        if (isHtml && shouldRenderFenced(body, { renderDocuments, renderFencedBlocks, streaming })) {
+        if (render) {
             segments.push({ type: 'html', html: body, fenced: true, unterminated });
         } else {
             // not ours, keep it as-is so nothing inside gets picked up as a document
@@ -86,6 +89,25 @@ function shouldRenderFenced(body, { renderDocuments, renderFencedBlocks, streami
         return true;
     }
     return renderFencedBlocks && HAS_STYLE_OR_SCRIPT.test(body);
+}
+
+/**
+ * Bare ``` blocks only count as a page if they open with the doctype or <html>.
+ * While streaming, a partial "<!DOC" is enough.
+ * @param {string} body
+ * @param {boolean} streaming
+ * @returns {boolean}
+ */
+function startsAsDocument(body, streaming) {
+    const opening = body.trimStart();
+    if (DOC_START.test(opening)) {
+        return true;
+    }
+    if (!streaming || !opening) {
+        return false;
+    }
+    const head = opening.slice(0, 15).toLowerCase();
+    return '<!doctype html'.startsWith(head) || '<html'.startsWith(head);
 }
 
 /**
