@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mira Vell — Character Profile</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Inter:wght@300;400;500&display=swap');
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    background: #0c1014;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+    font-family: 'Inter', sans-serif;
+  }
+
+  .profile {
+    max-width: 1100px;
+    width: 100%;
+    background: linear-gradient(145deg, #121a20 0%, #18222b 100%);
+    border: 1px solid rgba(120, 170, 160, 0.15);
+    border-radius: 2rem;
+    padding: 3rem;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .profile::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(ellipse at 30% 20%, rgba(120, 170, 160, 0.04) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  .header {
+    display: flex;
+    gap: 2.5rem;
+    margin-bottom: 3rem;
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .portrait {
+    width: 220px;
+    height: 280px;
+    border-radius: 1.2rem;
+    border: 1px solid rgba(120, 170, 160, 0.2);
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+
+  .portrait svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  .title-group {
+    flex: 1;
+    min-width: 250px;
+  }
+
+  .name {
+    font-family: 'Cinzel', serif;
+    font-weight: 700;
+    font-size: 2.8rem;
+    color: #cfe8df;
+    letter-spacing: 0.08em;
+  }
+
+  .epithet {
+    font-style: italic;
+    color: #8fb3a8;
+    margin: 0.3rem 0 0.8rem;
+  }
+
+  .stat-tag {
+    display: inline-block;
+    background: rgba(120, 170, 160, 0.08);
+    border: 1px solid rgba(120, 170, 160, 0.12);
+    padding: 0.3rem 0.8rem;
+    border-radius: 2rem;
+    font-size: 0.75rem;
+    color: #a8c8be;
+    margin: 0.2rem 0.2rem 0 0;
+  }
+
+  .section-title {
+    font-family: 'Cinzel', serif;
+    color: #b8d8cc;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+  }
+
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+  }
+
+  .card {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(120, 170, 160, 0.08);
+    border-radius: 1rem;
+    padding: 1.2rem;
+  }
+
+  .card-label {
+    font-size: 0.7rem;
+    color: #6a7a7a;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 0.4rem;
+  }
+
+  .card-value {
+    font-size: 0.9rem;
+    color: #d0dde0;
+    line-height: 1.6;
+  }
+
+  @media (max-width: 768px) {
+    .profile {
+      padding: 1.5rem;
+    }
+    .header {
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+    .grid-2 {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+</head>
+<body>
+<div class="profile">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="portrait">
+      <svg viewBox="0 0 220 280" xmlns="http://www.w3.org/2000/svg">
+        <rect width="220" height="280" fill="#18222b"/>
+        <path d="M30 200 Q40 160 60 170 L70 190 L150 190 L160 170 Q180 160 190 200 L200 280 L20 280 Z" fill="#2a3a40"/>
+        <ellipse cx="110" cy="120" rx="45" ry="55" fill="#c9a88a"/>
+        <path d="M65 120 Q65 60 110 50 Q155 60 155 120 L150 100 Q110 80 70 100 Z" fill="#3a2a20"/>
+        <ellipse cx="95" cy="115" rx="6" ry="6" fill="#3a7a6a"/>
+        <ellipse cx="125" cy="115" rx="6" ry="6" fill="#3a7a6a"/>
+        <path d="M100 138 Q110 144 120 138" stroke="#8a6a50" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <div class="title-group">
+      <div class="name">Mira Vell</div>
+      <div class="epithet">The Wandering Cartographer</div>
+      <span class="stat-tag">29 years</span>
+      <span class="stat-tag">Human</span>
+      <span class="stat-tag">Mapmaker</span>
+      <span class="stat-tag">Coastal Guild</span>
+    </div>
+  </div>
+
+  <!-- BASIC INFORMATION -->
+  <div class="section">
+    <div class="section-title">Basic Information</div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-label">Full Name</div>
+        <div class="card-value">Mira Vell of the Saltmarsh</div>
+      </div>
+      <div class="card">
+        <div class="card-label">Occupation</div>
+        <div class="card-value">Surveyor and mapmaker for the Coastal Guild</div>
+      </div>
+      <div class="card">
+        <div class="card-label">Home</div>
+        <div class="card-value">A lighthouse keeper's cottage she rents by the season</div>
+      </div>
+      <div class="card">
+        <div class="card-label">Tools</div>
+        <div class="card-value">Brass compass, sextant, and a satchel of charcoal pencils</div>
+      </div>
+      <div class="card">
+        <div class="card-label">Personality</div>
+        <div class="card-value">Curious, patient, and quietly stubborn. She trusts measurements more than rumours.</div>
+      </div>
+      <div class="card">
+        <div class="card-label">Goal</div>
+        <div class="card-value">To chart the drowned coastline before the next storm season reshapes it.</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

@@ -15,7 +15,9 @@
 
 .alltml-frame {
     display: block;
-    width: 100%;
+    /* just 100% and shrink-to-fit bubbles collapse to the iframe's default 300px */
+    width: 100vw;
+    max-width: 100%;
     border: 0;
     background: transparent;
     /* anything else and Chrome paints an opaque background */
