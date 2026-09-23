@@ -1,0 +1,12 @@
+{
+    "display_name": "AllTML",
+    "loading_order": 100,
+    "minimum_client_version": "1.19.0",
+    "requires": [],
+    "optional": [],
+    "js": "index.js",
+    "css": "style.css",
+    "author": "HalfToast",
+    "version": "0.1.0",
+    "homePage": "https://github.com/HalfToast/AllTML"
+}

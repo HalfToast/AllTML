@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AllTML harness</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha384-PPIZEGYM1v8zp5Py7UjFb79S58UeqCL9pYVnVPURKEqvioPROaVAJKKLzvH2rDnI" crossorigin="anonymous" referrerpolicy="no-referrer">
+<link rel="stylesheet" href="../style.css">
+<style>
+  body { background: #1d1d24; color: #ddd; font-family: sans-serif; max-width: 900px; margin: 2rem auto; padding: 0 1rem; }
+  h2 { margin-top: 2rem; font-size: 1rem; color: #aaa; }
+</style>
+</head>
+<body>
+<h1>AllTML harness</h1>
+<p>Dev-only page for checking frames and rendering outside SillyTavern. Serve the repo root over HTTP and open <code>/dev/harness.html</code>.</p>
+<div id="frames"></div>
+<div id="renders"></div>
+<script type="module">
+import { mountFrame } from '../src/frame.js';
+
+window.harness = { probes: {}, errors: {}, opened: [], escapeBubbled: 0 };
+window.open = (url) => { window.harness.opened.push(url); return null; };
+window.addEventListener('message', (event) => {
+    if (event.data && event.data.probe) window.harness.probes[event.data.probe] = event.data.result;
+});
+// fake ST Escape handler (jQuery, bubbles on document)
+document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') window.harness.escapeBubbled++;
+});
+// for Playwright
+window.harness.srcdoc = (name) => document.querySelector(`[data-case="${name}"] iframe`)?.srcdoc ?? null;
+
+const theme = { color: '#dddddd', fontFamily: 'sans-serif' };
+const profile = await (await fetch('../tests/fixtures/profile-unfenced.txt')).text();
+
+const SANDBOX_PROBE = `<!DOCTYPE html><html><body><p id="out">probing…</p><script>
+const result = {};
+try { result.parentDocument = !!parent.document.body; } catch (e) { result.parentDocument = 'blocked'; }
+try { localStorage.setItem('k', 'v'); result.storage = localStorage.getItem('k'); } catch (e) { result.storage = 'threw ' + e.name; }
+fetch('/').then(() => { result.fetch = 'allowed'; }, () => { result.fetch = 'blocked'; }).finally(() => {
+  document.getElementById('out').textContent = JSON.stringify(result);
+  parent.postMessage({ probe: 'sandbox', result }, '*');
+});
+<\/script></body></html>`;
+
+const RUNAWAY = '<!DOCTYPE html><html><body><div style="height:100vh;background:#335">hero sized to the window</div><p>below the hero</p></body></html>';
+const LINKS = '<!DOCTYPE html><html><body><p><a id="ext" href="https://example.com">external link</a></p></body></html>';
+const SCRIPTS_OFF = `<p id="x">static</p><script>document.getElementById('x').textContent = 'scripts ran'; parent.postMessage({ probe: 'scriptsOff', result: 'ran' }, '*');<\/script>`;
+const ERROR = `<p>throws on load</p><script>throw new Error('boom');<\/script>`;
+const NAVIGATE = `<!DOCTYPE html><html><body><p>nav test</p><script>setTimeout(() => { location.href = 'about:blank'; }, 300);<\/script></body></html>`;
+const STRIP_NAV = '<!DOCTYPE html><html><head><meta http-equiv="refresh" content="0;url=https://example.com/"><link rel="dns-prefetch" href="https://example.com"></head><body><p>should stay here</p></body></html>';
+const SHADOW_LINK = '<!DOCTYPE html><html><body><div id="host"><template shadowrootmode="open"><p><a id="shadow" href="https://example.com/shadow">link inside shadow DOM</a></p></template></div></body></html>';
+// scrolls without user input, should be ignored
+const SCROLL_GUARD = `<!DOCTYPE html><html><body><p><a id="jump" href="#far">jump to the end</a></p><div style="height:1500px"></div><p id="far">far away</p><script>
+setTimeout(() => { document.getElementById('jump').click(); parent.postMessage({ probe: 'scrollGuard', result: 'clicked' }, '*'); }, 300);
+<\/script></body></html>`;
+
+function addFrameCase(name, html, options = {}) {
+    const title = document.createElement('h2');
+    title.textContent = name;
+    const box = document.createElement('div');
+    box.dataset.case = name;
+    document.getElementById('frames').append(title, box);
+    mountFrame(box, {
+        html, scripts: true, externalAllowed: false, theme, mode: 'inline', cacheKey: name,
+        onError: (message) => { (window.harness.errors[name] ??= []).push(message); },
+        ...options,
+    });
+}
+
+addFrameCase('profile', profile);
+addFrameCase('sandbox', SANDBOX_PROBE);
+addFrameCase('runaway', RUNAWAY);
+addFrameCase('links', LINKS);
+addFrameCase('scripts-off', SCRIPTS_OFF, { scripts: false });
+addFrameCase('error', ERROR);
+addFrameCase('navigate', NAVIGATE);
+addFrameCase('strip-nav', STRIP_NAV);
+addFrameCase('shadow-link', SHADOW_LINK);
+addFrameCase('scroll-guard', SCROLL_GUARD);
+// nav guard gave up
+window.harness.navigateStopped = () => (window.harness.srcdoc('navigate') ?? '').includes('AllTML stopped this page');
+
+// `same` = input came back untouched
+const { stripAutoNavigation } = await import('../src/sanitize.js');
+window.harness.sanitize = Object.fromEntries(Object.entries({
+    plain: '<p>x</p>',
+    charsetOnly: '<!DOCTYPE html><html><head><meta charset="utf-8"><link rel="stylesheet" href="a.css"></head><body>x</body></html>',
+    encodedRefresh: '<meta http-equiv=" &#82;efresh " content="0;url=https://example.com/"><p>x</p>',
+    relTokens: '<link rel="Stylesheet  PREFETCH" href="https://example.com/x"><p>x</p>',
+    noscriptMutation: '<p>x</p><link rel=dns-prefetch href=//example.com><noscript><p title="</noscript><meta http-equiv=refresh content=0;url=https://example.com/>"></p></noscript>',
+    shadowRoot: '<div><template shadowrootmode="open"><meta http-equiv="refresh" content="0;url=https://example.com/"><p>x</p></template></div>',
+}).map(([name, input]) => {
+    const out = stripAutoNavigation(input);
+    // anything left here would be live in the frame
+    const reparsed = new DOMParser().parseFromString(out.html, 'text/html');
+    const leftover = reparsed.querySelectorAll('meta[http-equiv], link[rel~="prefetch" i], link[rel~="dns-prefetch" i], noscript').length;
+    return [name, { removed: out.removed, same: out.html === input, leftover }];
+}));
+
+const { renderMessage } = await import('../src/render.js');
+const { detect } = await import('../src/detect.js');
+const { repair } = await import('../src/repair.js');
+const fencedProfile = await (await fetch('../tests/fixtures/profile-fenced.txt')).text();
+const escapeHtml = (text) => text.replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
+const formatProse = (text) => `<p>${escapeHtml(text)}</p>`;
+
+function addRenderCase(name, text, { streaming = false } = {}) {
+    const title = document.createElement('h2');
+    title.textContent = `render: ${name}`;
+    const mesText = document.createElement('div');
+    mesText.className = 'mes_text';
+    mesText.dataset.render = name;
+    document.getElementById('renders').append(title, mesText);
+    renderMessage(mesText, {
+        segments: detect(text, { streaming }),
+        key: name,
+        streaming,
+        formatProse,
+        repair,
+        frame: { scripts: true, externalAllowed: false, theme },
+        showControlBar: true,
+        cachePrefix: name,
+    });
+}
+
+addRenderCase('prose-around', `She slides a card across the table.\n\n${fencedProfile}\n\n*She waits.*`);
+addRenderCase('broken-style', 'The note reads:\n```html\n<style>\n.note{color:#e8d5b0;border:1px solid #886;padding:1em}\n<div class="note">Meet me at the old mill.</div>');
+addRenderCase('streaming', 'Intro\n```html\n<!DOCTYPE html><html><head><style>p{color:red}', { streaming: true });
+// 5 errors per load + reloads itself, tests the parent-side cap
+addRenderCase('many-errors', '```html\n<p>errors</p><script>for (let i = 0; i < 5; i++) setTimeout(() => { throw new Error(`e${i}`); });\nsetTimeout(() => location.reload(), 300);<\/script>\n```');
+window.harness.downloads = [];
+const createObjectURL = URL.createObjectURL.bind(URL);
+URL.createObjectURL = (blob) => { window.harness.downloads.push(blob.size); return createObjectURL(blob); };
+window.harness.ready = true;
+</script>
+</body>
+</html>

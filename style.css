@@ -1,0 +1,133 @@
+.alltml-root {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5em;
+}
+
+.alltml-block {
+    position: relative;
+}
+
+/* .fa-solid sets display and beats [hidden] otherwise */
+.alltml-root [hidden] {
+    display: none !important;
+}
+
+.alltml-frame {
+    display: block;
+    width: 100%;
+    border: 0;
+    background: transparent;
+    /* anything else and Chrome paints an opaque background */
+    color-scheme: normal;
+}
+
+.alltml-frame-locked {
+    outline: 1px dashed var(--SmartThemeBorderColor, #888);
+}
+
+.alltml-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35em;
+    justify-content: flex-end;
+    align-items: center;
+    margin-top: 0.25em;
+    font-size: 0.85em;
+    opacity: 0.35;
+    transition: opacity 0.2s;
+}
+
+.alltml-block:hover .alltml-bar,
+.alltml-bar:focus-within {
+    opacity: 1;
+}
+
+@media (hover: none) {
+    .alltml-bar {
+        opacity: 0.8;
+    }
+}
+
+.alltml-button {
+    background: none;
+    border: 1px solid var(--SmartThemeBorderColor, #888);
+    border-radius: 5px;
+    color: var(--SmartThemeBodyColor, inherit);
+    cursor: pointer;
+    font-size: inherit;
+    padding: 0.15em 0.55em;
+}
+
+.alltml-button:hover {
+    background: var(--SmartThemeBlurTintColor, rgba(127, 127, 127, 0.2));
+}
+
+.alltml-errors {
+    color: #e0a030;
+    cursor: help;
+}
+
+.alltml-fixed {
+    cursor: help;
+    font-style: italic;
+    opacity: 0.7;
+}
+
+.alltml-source {
+    margin-top: 0.35em;
+}
+
+.alltml-source ul {
+    margin: 0 0 0.35em;
+    opacity: 0.8;
+}
+
+.alltml-source pre {
+    max-height: 50vh;
+    overflow: auto;
+    white-space: pre-wrap;
+}
+
+.alltml-placeholder {
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+    padding: 0.75em 1em;
+    border: 1px dashed var(--SmartThemeBorderColor, #888);
+    border-radius: 8px;
+    font-size: 0.9em;
+    opacity: 0.8;
+}
+
+.alltml-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    display: flex;
+    flex-direction: column;
+    padding: max(1rem, env(safe-area-inset-top, 0px)) 1rem max(1rem, env(safe-area-inset-bottom, 0px));
+    background: rgba(0, 0, 0, 0.8);
+}
+
+.alltml-overlay-close {
+    align-self: flex-end;
+    margin-bottom: 0.5rem;
+}
+
+.alltml-overlay-body {
+    flex: 1;
+    min-height: 0;
+    /* for pages with no background of their own */
+    background: var(--SmartThemeBlurTintColor, #1e1e24);
+    border-radius: 8px;
+}
+
+.alltml-frame-fullscreen {
+    height: 100%;
+    border-radius: 8px;
+}
+
+.alltml-settings select {
+    width: 100%;
+}

@@ -1,0 +1,41 @@
+<div class="alltml-settings">
+    <div class="inline-drawer">
+        <div class="inline-drawer-toggle inline-drawer-header">
+            <b>AllTML</b>
+            <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div>
+        </div>
+        <div class="inline-drawer-content">
+            <label class="checkbox_label" for="alltml_enabled">
+                <input id="alltml_enabled" type="checkbox" data-alltml-setting="enabled">
+                <span>Enable AllTML</span>
+            </label>
+            <label class="checkbox_label" for="alltml_run_scripts" title="Scripts run in an isolated sandbox and can't access SillyTavern.">
+                <input id="alltml_run_scripts" type="checkbox" data-alltml-setting="runScripts">
+                <span>Run scripts inside pages</span>
+            </label>
+            <label class="checkbox_label" for="alltml_documents">
+                <input id="alltml_documents" type="checkbox" data-alltml-setting="renderDocuments">
+                <span>Render complete HTML documents</span>
+            </label>
+            <label class="checkbox_label" for="alltml_fenced">
+                <input id="alltml_fenced" type="checkbox" data-alltml-setting="renderFencedBlocks">
+                <span>Render <code>```html</code> blocks that contain &lt;style&gt; or &lt;script&gt;</span>
+            </label>
+            <label class="checkbox_label" for="alltml_user_messages">
+                <input id="alltml_user_messages" type="checkbox" data-alltml-setting="renderUserMessages">
+                <span>Render pages in your own messages too</span>
+            </label>
+            <label class="checkbox_label" for="alltml_control_bar">
+                <input id="alltml_control_bar" type="checkbox" data-alltml-setting="showControlBar">
+                <span>Show Source / Fullscreen / Save buttons</span>
+            </label>
+            <label for="alltml_external">External resources (web fonts, images, CDN scripts)</label>
+            <select id="alltml_external" class="text_pole" data-alltml-setting="externalResources">
+                <option value="follow">Follow SillyTavern's "Forbid External Media"</option>
+                <option value="allow">Always allow</option>
+                <option value="block">Always block</option>
+            </select>
+            <small>SillyTavern forbids external media by default. Allow it per character with the "Ext. Media" button in the character panel.</small>
+        </div>
+    </div>
+</div>
