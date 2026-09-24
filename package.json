@@ -1,6 +1,6 @@
 {
     "name": "alltml",
-    "version": "0.1.1",
+    "version": "0.1.2",
     "private": true,
     "description": "SillyTavern extension that renders AI-generated HTML pages inside chat messages.",
     "type": "module",

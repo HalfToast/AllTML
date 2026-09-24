@@ -106,7 +106,10 @@ export function mountFrame(container, options) {
  * @param {Omit<FrameOptions, 'mode'|'cacheKey'>} options
  */
 export function openFullscreen(options) {
-    const overlay = document.createElement('div');
+    if (document.querySelector('.alltml-overlay')) return;
+    // <dialog> so it goes in the top layer. On mobile ST a fixed div collapsed to a 32px strip
+    // (<html> has translateZ(0) and zero height there)
+    const overlay = document.createElement('dialog');
     overlay.className = 'alltml-overlay';
     const close = document.createElement('button');
     close.type = 'button';
@@ -116,6 +119,7 @@ export function openFullscreen(options) {
     body.className = 'alltml-overlay-body';
     overlay.append(close, body);
     document.body.append(overlay);
+    overlay.showModal();
     mountFrame(body, { ...options, mode: 'fullscreen', cacheKey: undefined });
 
     // capture phase, ST's own Escape handler stops generation
@@ -133,6 +137,11 @@ export function openFullscreen(options) {
     close.addEventListener('click', dismiss);
     overlay.addEventListener('click', (event) => {
         if (event.target === overlay) dismiss();
+    });
+    // Escape via the dialog itself
+    overlay.addEventListener('cancel', (event) => {
+        event.preventDefault();
+        dismiss();
     });
     document.addEventListener('keydown', onKey, true);
     close.focus();

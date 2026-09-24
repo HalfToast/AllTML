@@ -102,14 +102,27 @@
     opacity: 0.8;
 }
 
-.alltml-overlay {
+/* a modal <dialog>, so undo the browser's dialog box styling */
+.alltml-overlay[open] {
     position: fixed;
     inset: 0;
-    z-index: 10000;
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh;
+    max-width: none;
+    max-height: none;
+    margin: 0;
+    border: 0;
     display: flex;
     flex-direction: column;
+    box-sizing: border-box;
     padding: max(1rem, env(safe-area-inset-top, 0px)) 1rem max(1rem, env(safe-area-inset-bottom, 0px));
     background: rgba(0, 0, 0, 0.8);
+    color: inherit;
+}
+
+.alltml-overlay::backdrop {
+    background: transparent;
 }
 
 .alltml-overlay-close {
