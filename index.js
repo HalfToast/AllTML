@@ -5,6 +5,7 @@ import { sweepFrames } from './src/frame.js';
 import { isExternalAllowed } from './src/media.js';
 import { loadSettings, bindSettingsPanel } from './src/settings.js';
 import { hashString } from './src/util.js';
+import { unwrapTextSegments } from './src/fadein.js';
 
 // e.g. "third-party/AllTML", depends on where it was installed
 const EXTENSION_PATH = new URL('.', import.meta.url).pathname
@@ -46,9 +47,11 @@ function processMessage(messageElement) {
     const message = ctx.chat[id];
     if (!message) return;
 
+    const streaming = streamingId === id;
+    if (!streaming && settings.enabled && settings.fixStreamFadeIn) unwrapTextSegments(mesText);
+
     const existing = mesText.querySelector(`:scope > .${ROOT_CLASS}`);
     const raw = message.extra?.display_text ?? message.mes ?? '';
-    const streaming = streamingId === id;
     const externalAllowed = isExternalAllowed(ctx, settings.externalResources);
     const key = hashString(JSON.stringify([raw, streaming, externalAllowed, settings]));
     if (existing?.getAttribute('data-key') === key || failedKeys.get(mesText) === key) return;

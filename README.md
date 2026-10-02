@@ -58,6 +58,7 @@ Text before and after a page is formatted by SillyTavern as usual. A message can
 | Render ```` ```html ```` blocks that contain `<style>`/`<script>` | on | See table above |
 | Render pages in your own messages too | on | Also render pages in user messages |
 | Show Source / Fullscreen / Save buttons | on | The small bar under each page |
+| Fix regex styling broken by Stream fade-in | on | Strips the spans SillyTavern's **Stream fade-in** leaves behind once a reply finishes, so regex/preset styling works. See Troubleshooting |
 | External resources | Follow SillyTavern | Whether pages may load web fonts, images and CDN scripts |
 
 ## Buttons under each page
@@ -84,6 +85,9 @@ Some pages rebuild themselves after loading with `document.open()`/`document.wri
 
 **Pages render twice or look odd with JS-Slash-Runner / Tavern Helper installed.**
 That extension renders HTML in messages too, so turn off its message rendering or disable AllTML. AllTML warns you when it spots it, but it only checks for Tavern Helper's global object so it can miss odd setups.
+
+**Regex or preset styling looks broken until I edit and save the message.**
+That's SillyTavern's **User Settings → Stream fade-in**. It wraps every word of a streamed reply in a `<span>` and leaves them there, which empties `<style>` blocks, makes each word its own flex/grid item, and turns line breaks into `<br>`s. Editing and saving re-renders the message without the spans, so that's why it seems to fix it. AllTML strips the spans once a reply finishes (the **Fix regex styling broken by Stream fade-in** setting), but things can still look off while it's streaming. Turn Stream fade-in off if that bugs you.
 
 **Regex scripts don't affect a page.**
 Regex scripts set to "alter display" only apply to the text around a page, not to the HTML inside it.

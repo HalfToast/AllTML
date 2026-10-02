@@ -8,13 +8,15 @@ export const DEFAULT_SETTINGS = Object.freeze({
     renderFencedBlocks: true,
     renderUserMessages: true,
     showControlBar: true,
+    fixStreamFadeIn: true,
 });
 
 const EXTERNAL_MODES = ['follow', 'allow', 'block'];
 
 /**
  * @typedef {{enabled: boolean, runScripts: boolean, externalResources: 'follow'|'allow'|'block',
- *   renderDocuments: boolean, renderFencedBlocks: boolean, renderUserMessages: boolean, showControlBar: boolean}} Settings
+ *   renderDocuments: boolean, renderFencedBlocks: boolean, renderUserMessages: boolean, showControlBar: boolean,
+ *   fixStreamFadeIn: boolean}} Settings
  */
 
 /**

@@ -29,6 +29,10 @@
                 <input id="alltml_control_bar" type="checkbox" data-alltml-setting="showControlBar">
                 <span>Show Source / Fullscreen / Save buttons</span>
             </label>
+            <label class="checkbox_label" for="alltml_fix_fade_in" title="SillyTavern's Stream fade-in leaves every word in its own span, which breaks &lt;style&gt; blocks and flex/grid layouts from regex scripts.">
+                <input id="alltml_fix_fade_in" type="checkbox" data-alltml-setting="fixStreamFadeIn">
+                <span>Fix regex styling broken by Stream fade-in</span>
+            </label>
             <label for="alltml_external">External resources (web fonts, images, CDN scripts)</label>
             <select id="alltml_external" class="text_pole" data-alltml-setting="externalResources">
                 <option value="follow">Follow SillyTavern's "Forbid External Media"</option>
